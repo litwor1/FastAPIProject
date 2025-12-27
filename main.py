@@ -34,27 +34,34 @@ def geocode(lat: float, lon: float):
 @app.get('/movies')
 def get_movies():
     with sqlite3.connect('movies.db') as db:
-        output = []
+        db.row_factory = sqlite3.Row
         cursor = db.cursor()
-        cursor.execute('SELECT * FROM movies')
-        for row in cursor:
-            movie = {'id': f'{row[0]}', 'title': f'{row[1]}', 'year': f'{row[2]}', 'actors': f'{row[3]}', }
-            output.append(movie)
+        rows = cursor.execute('SELECT * FROM movies')
+        output = [
+            {
+                'id': row['id'],
+                'title': row['title'],
+                'year': row['year'],
+                'actors': row['actors'],
+            }
+            for row in rows
+        ]
         return output
 
 
 @app.get('/movies/{movie_id}')
 def get_single_movie(movie_id: int):
     with sqlite3.connect('movies.db') as db:
+        db.row_factory = sqlite3.Row
         cursor = db.cursor()
         row = cursor.execute('SELECT * FROM movies WHERE id = ?', (movie_id,)).fetchone()
 
         if row:
             movie = {
-                'id': row[0],
-                'title': row[1],
-                'year': row[2],
-                'actors': row[3]
+                'id': row['id'],
+                'title': row['title'],
+                'year': row['year'],
+                'actors': row['actors'],
             }
         else:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
@@ -138,13 +145,3 @@ def search_movies(characteristic: str):
             return [dict(row) for row in rows]
         else:
             return {'message': 'Movie not found'}
-
-
-@app.get('/movies_extended')
-def get_movies():
-    with sqlite3.connect('movies-extended.db') as db:
-        cursor = db.cursor()
-        cursor.execute('SELECT * FROM movie')
-        output = [{'id': f'{row[0]}', 'title': f'{row[1]}', 'director': f'{row[2]}', 'year': f'{row[3]}',
-                   'description': f'{row[4]}'} for row in cursor]
-    return output
