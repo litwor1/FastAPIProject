@@ -1,0 +1,43 @@
+### Get ALL movies
+GET http://127.0.0.1:8000/movies_extended
+
+### Get a SINGLE movie by ID
+GET http://127.0.0.1:8000/movies_extended/1
+
+### 1. Add a new movie
+POST http://127.0.0.1:8000/movies_extended
+Content-Type: application/json
+
+{
+  "title": "Inception",
+  "director": "Christopher Nolan",
+  "year": "2010",
+  "description": "A thief who steals corporate secrets through the use of dream-sharing technology."
+}
+
+### 2. Update a movie
+PUT http://127.0.0.1:8000/movies_extended/9
+Content-Type: application/json
+
+{
+  "title": "Inception: Special Edition",
+  "director": "Christopher Nolan",
+  "year": "2010",
+  "description": "A thief who steals corporate secrets through the use of dream-sharing technology."
+}
+
+### 3. Try to update a non-existent movie
+PUT http://127.0.0.1:8000/movies_extended/9999
+Content-Type: application/json
+
+{
+  "title": "Ghost Movie",
+  "director": "Unknown",
+  "year": "2020",
+  "description": "This movie does not exist."
+}
+### 4. Delete a specific movie
+DELETE http://127.0.0.1:8000/movies_extended/10
+
+### 5. Delete ALL movies
+DELETE http://127.0.0.1:8000/movies_extended

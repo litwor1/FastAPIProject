@@ -110,7 +110,7 @@ def update_movie(movie_id: int, params: dict[str, Any]):
     return {"message": "Movie updated successfully"}
 
 
-@app.delete("/movies/{movie_id}", status_code=204)  # 204 = No Content (sukces, ale bez treści)
+@app.delete("/movies/{movie_id}", status_code=204)
 def delete_movie(movie_id: int):
     with sqlite3.connect('movies.db') as db:
         cursor = db.cursor()
