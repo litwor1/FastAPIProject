@@ -2,8 +2,10 @@ from fastapi import FastAPI, HTTPException
 import requests
 import sqlite3
 from typing import Any
+from movies_extended_endpoints import router as extended_router
 
 app = FastAPI()
+app.include_router(extended_router)
 
 
 @app.get("/")
@@ -136,3 +138,13 @@ def search_movies(characteristic: str):
             return [dict(row) for row in rows]
         else:
             return {'message': 'Movie not found'}
+
+
+@app.get('/movies_extended')
+def get_movies():
+    with sqlite3.connect('movies-extended.db') as db:
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM movie')
+        output = [{'id': f'{row[0]}', 'title': f'{row[1]}', 'director': f'{row[2]}', 'year': f'{row[3]}',
+                   'description': f'{row[4]}'} for row in cursor]
+    return output
