@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import requests
 import sqlite3
 from typing import Any
@@ -71,3 +71,56 @@ def add_movie(params: dict[str, Any]):
         db.commit()
 
     return {"message": f"Movie added successfully"}
+
+
+@app.put("/movies/{movie_id}")
+def update_movie(movie_id: int, params: dict[str, Any]):
+    with sqlite3.connect('movies.db') as db:
+        cursor = db.cursor()
+        cursor.execute(
+            "UPDATE movies SET title=?, year=?, actors=? WHERE id=?",
+            (params["title"], params["year"], params["actors"], movie_id)
+        )
+        db.commit()
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
+
+    return {"message": "Movie updated successfully"}
+
+
+@app.delete("/movies/{movie_id}", status_code=204)  # 204 = No Content (sukces, ale bez treści)
+def delete_movie(movie_id: int):
+    with sqlite3.connect('movies.db') as db:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM movies WHERE id = ?", (movie_id,))
+        db.commit()
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
+
+    return
+
+
+@app.delete("/movies")
+def delete_all_movies():
+    with sqlite3.connect('movies.db') as db:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM movies")
+        db.commit()
+        deleted_count = cursor.rowcount
+
+    return {"message": f"Deleted all movies. Total removed: {deleted_count}"}
+
+
+@app.get("/moviesearch")
+def search_movies(characteristic: str):
+    with sqlite3.connect('movies.db') as db:
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        rows = cursor.execute("SELECT * FROM movies WHERE title LIKE ? OR actors LIKE ?",
+                              ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
+        if rows:
+            return [dict(row) for row in rows]
+        else:
+            return {'message': 'Movie not found'}

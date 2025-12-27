@@ -1,12 +1,41 @@
-### Add a new movie
-POST http://localhost:8000/movies
+### Get ALL movies
+GET http://127.0.0.1:8000/movies
+
+### Get a SINGLE movie by ID
+GET http://127.0.0.1:8000/movies/1
+
+### 1. Add a new movie
+POST http://127.0.0.1:8000/movies
 Content-Type: application/json
 
 {
-  "title": "The Godfather",
-  "year": "1972",
-  "actors": "Marlon Brando, Al Pacino"
+  "title": "Matrix",
+  "year": "1999",
+  "actors": "Keanu Reeves"
 }
 
-### Get all movies
-GET http://localhost:8000/movies
+### 2. Update a movie
+PUT http://127.0.0.1:8000/movies/5
+Content-Type: application/json
+
+{
+  "title": "Matrix: Resurrections",
+  "year": "2025",
+  "actors": "Keanu Reeves, Carrie-Anne Moss"
+}
+
+### 3. Try to update a non-existent movie
+PUT http://127.0.0.1:8000/movies/9999
+Content-Type: application/json
+
+{
+  "title": "Ghost Movie",
+  "year": "2020",
+  "actors": "Nobody"
+}
+
+### 4. Delete a specific movie
+DELETE http://127.0.0.1:8000/movies/4
+
+### 5. Delete ALL movies
+DELETE http://127.0.0.1:8000/movies
