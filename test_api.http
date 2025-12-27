@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### 2. Update a movie
-PUT http://127.0.0.1:8000/movies/5
+PUT http://127.0.0.1:8000/movies/1
 Content-Type: application/json
 
 {

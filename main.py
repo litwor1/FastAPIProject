@@ -55,36 +55,48 @@ def get_single_movie(movie_id: int):
                 'actors': row[3]
             }
         else:
-            movie = {'message': 'Movie not found'}
+            raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
 
     return movie
 
 
 @app.post("/movies")
 def add_movie(params: dict[str, Any]):
-    with sqlite3.connect('movies.db') as db:
-        cursor = db.cursor()
-        cursor.execute(
-            "INSERT INTO movies (title, year, actors) VALUES (?, ?, ?)",
-            (params["title"], params["year"], params["actors"])
+    try:
+        with sqlite3.connect('movies.db') as db:
+            cursor = db.cursor()
+            cursor.execute(
+                "INSERT INTO movies (title, year, actors) VALUES (?, ?, ?)",
+                (params["title"], params["year"], params["actors"])
+            )
+            db.commit()
+    except KeyError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"You are missing a required field: {e}"
         )
-        db.commit()
 
-    return {"message": f"Movie added successfully"}
+    return {"message": f"Movie {params} added successfully"}
 
 
 @app.put("/movies/{movie_id}")
 def update_movie(movie_id: int, params: dict[str, Any]):
-    with sqlite3.connect('movies.db') as db:
-        cursor = db.cursor()
-        cursor.execute(
-            "UPDATE movies SET title=?, year=?, actors=? WHERE id=?",
-            (params["title"], params["year"], params["actors"], movie_id)
-        )
-        db.commit()
+    try:
+        with sqlite3.connect('movies.db') as db:
+            cursor = db.cursor()
+            cursor.execute(
+                "UPDATE movies SET title=?, year=?, actors=? WHERE id=?",
+                (params["title"], params["year"], params["actors"], movie_id)
+            )
+            db.commit()
 
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
+    except KeyError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"You are missing a required field: {e}"
+        )
 
     return {"message": "Movie updated successfully"}
 
