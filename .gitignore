@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+
+.venv/
+venv/
+env/
+
+# I'd normally refuse to send db files, but I treat it as a demo,
+# so I want this simple db to be accessible right away with the full project
+#*.db
+#*.sqlite3
+
+.DS_Store
+
+.idea/
+.vscode/
