@@ -1,0 +1,12 @@
+### Add a new movie
+POST http://localhost:8000/movies
+Content-Type: application/json
+
+{
+  "title": "The Godfather",
+  "year": "1972",
+  "actors": "Marlon Brando, Al Pacino"
+}
+
+### Get all movies
+GET http://localhost:8000/movies

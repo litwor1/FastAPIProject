@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import requests
 import sqlite3
+from typing import Any
 
 app = FastAPI()
 
@@ -57,3 +58,16 @@ def get_single_movie(movie_id: int):
             movie = {'message': 'Movie not found'}
 
     return movie
+
+
+@app.post("/movies")
+def add_movie(params: dict[str, Any]):
+    with sqlite3.connect('movies.db') as db:
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO movies (title, year, actors) VALUES (?, ?, ?)",
+            (params["title"], params["year"], params["actors"])
+        )
+        db.commit()
+
+    return {"message": f"Movie added successfully"}
