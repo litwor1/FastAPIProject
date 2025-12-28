@@ -21,18 +21,7 @@ def get_extended_movies():
             cursor = db.cursor()
             cursor.execute('SELECT * FROM movie')
             rows = cursor.fetchall()
-
-            output = [
-                {
-                    'id': row['id'],
-                    'title': row['title'],
-                    'director': row['director'],
-                    'year': row['year'],
-                    'description': row['description']
-                }
-                for row in rows
-            ]
-            return output
+            return [dict(row) for row in rows]
 
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database Error: {e}")
@@ -48,13 +37,7 @@ def get_single_movie(movie_id: int):
         row = cursor.execute('SELECT * FROM movie WHERE id = ?', (movie_id,)).fetchone()
 
         if row:
-            movie = {
-                'id': row['id'],
-                'title': row['title'],
-                'director': row['director'],
-                'year': row['year'],
-                'description': row['description']
-            }
+            movie = dict(row)
         else:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
 
@@ -166,15 +149,7 @@ def get_all_actors():
             cursor.execute('SELECT * FROM actor')
             rows = cursor.fetchall()
 
-            output = [
-                {
-                    'id': row['id'],
-                    'name': row['name'],
-                    'surname': row['surname'],
-                }
-                for row in rows
-            ]
-            return output
+            return [dict(row) for row in rows]
 
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database Error: {e}")
