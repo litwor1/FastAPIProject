@@ -20,7 +20,8 @@ def get_extended_movies():
     cursor = db.cursor()
 
     try:
-        cursor.execute('SELECT * FROM movie')
+        query = 'SELECT * FROM movie'
+        cursor.execute(query)
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
 
@@ -38,7 +39,8 @@ def get_single_movie(movie_id: int):
     db = connect_to_db()
     cursor = db.cursor()
     try:
-        row = cursor.execute('SELECT * FROM movie WHERE id = ?', (movie_id,)).fetchone()
+        query = 'SELECT * FROM movie WHERE id = ?'
+        row = cursor.execute(query, (movie_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
         return dict(row)
@@ -55,8 +57,9 @@ def add_extended_movie(params: dict[str, Any]):
     db = connect_to_db()
     cursor = db.cursor()
     try:
+        query = "INSERT INTO movie (title, director, year, description) VALUES (?, ?, ?, ?)"
         cursor.execute(
-            "INSERT INTO movie (title, director, year, description) VALUES (?, ?, ?, ?)",
+            query,
             (params["title"], params["director"], params["year"], params["description"])
         )
         db.commit()
@@ -79,8 +82,9 @@ def update_extended_movie(movie_id: int, params: dict[str, Any]):
     db = connect_to_db()
     cursor = db.cursor()
     try:
+        query = "UPDATE movie SET title=?, director=?, year=?, description=? WHERE id=?"
         cursor.execute(
-            "UPDATE movie SET title=?, director=?, year=?, description=? WHERE id=?",
+            query,
             (params["title"], params["director"], params["year"], params["description"], movie_id)
         )
         db.commit()
@@ -104,7 +108,8 @@ def delete_extended_movie(movie_id: int):
     db = connect_to_db()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM movie WHERE id = ?", (movie_id,))
+        query = "DELETE FROM movie WHERE id = ?"
+        cursor.execute(query, (movie_id,))
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
@@ -120,7 +125,8 @@ def delete_extended_all_movies():
     """
     db = connect_to_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM movie")
+    query = "DELETE FROM movie"
+    cursor.execute(query)
     db.commit()
     deleted_count = cursor.rowcount
     db.close()
@@ -134,8 +140,8 @@ def search_extended_movies(characteristic: str):
     """
     db = connect_to_db()
     cursor = db.cursor()
-    rows = cursor.execute("SELECT * FROM movie WHERE title LIKE ? OR director LIKE ?",
-                          ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
+    query = "SELECT * FROM movie WHERE title LIKE ? OR director LIKE ?"
+    rows = cursor.execute(query, ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
     if rows:
         return [dict(row) for row in rows]
     else:
@@ -150,7 +156,8 @@ def get_all_actors():
     db = connect_to_db()
     cursor = db.cursor()
     try:
-        cursor.execute('SELECT * FROM actor')
+        query = 'SELECT * FROM actor'
+        cursor.execute(query)
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
 
@@ -166,7 +173,8 @@ def search_actors(actor_id):
     db = connect_to_db()
     cursor = db.cursor()
     try:
-        row = cursor.execute("SELECT * FROM actor WHERE id = ?", (actor_id,)).fetchone()
+        query = "SELECT * FROM actor WHERE id = ?"
+        row = cursor.execute(query, (actor_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
         return dict(row)
@@ -183,8 +191,9 @@ def add_actor(params: dict[str, Any]):
     db = connect_to_db()
     cursor = db.cursor()
     try:
+        query = "INSERT INTO actor (name, surname) VALUES (?, ?)"
         cursor.execute(
-            "INSERT INTO actor (name, surname) VALUES (?, ?)",
+            query,
             (params["name"], params["surname"])
         )
         db.commit()
@@ -205,11 +214,8 @@ def update_actors(actor_id: int, params: dict[str, Any]):
     db = connect_to_db()
     cursor = db.cursor()
     try:
-
-        cursor.execute(
-            "UPDATE actor SET name=?, surname=? WHERE id=?",
-            (params["name"], params["surname"], actor_id)
-        )
+        query = "UPDATE actor SET name=?, surname=? WHERE id=?"
+        cursor.execute(query, (params["name"], params["surname"], actor_id))
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
