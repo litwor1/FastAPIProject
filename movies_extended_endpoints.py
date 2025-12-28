@@ -257,3 +257,23 @@ def delete_actor(actor_id: int):
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
 
     return
+
+
+@router.get("/movies_extended/{movie_id}/actors")
+def get_actors_for_movie(movie_id: int):
+    """
+    Fetches a list of actors for a specific movie identified by its ID.
+
+    """
+    with sqlite3.connect('movies-extended.db') as db:
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        query = """
+                SELECT actor.name, actor.surname
+                FROM actor
+                         JOIN movie_actor_through ON actor.id = movie_actor_through.actor_id
+                WHERE movie_actor_through.movie_id = ? \
+                """
+        cursor.execute(query, (movie_id,))
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
