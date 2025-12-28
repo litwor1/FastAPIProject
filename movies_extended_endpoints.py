@@ -65,10 +65,7 @@ def add_extended_movie(params: dict[str, Any]):
         db.commit()
         return {"message": f"Movie {params} added successfully"}
     except KeyError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"You are missing a required field: {e}"
-        )
+        raise HTTPException(status_code=400, detail=f"You are missing a required field: {e}")
     finally:
         db.close()
 
@@ -92,10 +89,7 @@ def update_extended_movie(movie_id: int, params: dict[str, Any]):
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
         return {"message": "Movie updated successfully"}
     except KeyError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"You are missing a required field: {e}"
-        )
+        raise HTTPException(status_code=400, detail=f"You are missing a required field: {e}")
     finally:
         db.close()
 
@@ -200,7 +194,7 @@ def add_actor(params: dict[str, Any]):
         return {"message": f"Actor {params} added successfully"}
 
     except KeyError as e:
-        raise HTTPException(status_code=400)
+        raise HTTPException(status_code=400, detail=f"You are missing a required field: {e}")
     finally:
         db.close()
 
@@ -222,12 +216,12 @@ def update_actors(actor_id: int, params: dict[str, Any]):
         return {"message": "Actors updated successfully"}
 
     except KeyError as e:
-        raise HTTPException(status_code=400)
+        raise HTTPException(status_code=400, detail=f"You are missing a required field: {e}")
     finally:
         db.close()
 
 
-@router.delete("/actors/{actor_id}", status_code=204)
+@router.delete("/actors/{actor_id}")
 def delete_actor(actor_id: int):
     """
     Delete a specific actor from the database by ID.
@@ -240,6 +234,7 @@ def delete_actor(actor_id: int):
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
+        return {"message": f"Actor with ID {actor_id} deleted successfully"}
     finally:
         db.close()
 
