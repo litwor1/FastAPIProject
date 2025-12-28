@@ -1,5 +1,4 @@
 from typing import Any
-
 from fastapi import APIRouter, HTTPException
 import sqlite3
 
@@ -8,6 +7,9 @@ router = APIRouter()
 
 @router.get('/movies_extended')
 def get_extended_movies():
+    """
+    Retrieve all movies from the extended database.
+    """
     try:
         with sqlite3.connect('movies-extended.db') as db:
             db.row_factory = sqlite3.Row
@@ -33,6 +35,9 @@ def get_extended_movies():
 
 @router.get('/movies_extended/{movie_id}')
 def get_single_movie(movie_id: int):
+    """
+    Retrieve a single movie by its unique ID.
+    """
     with sqlite3.connect('movies-extended.db') as db:
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
@@ -54,6 +59,10 @@ def get_single_movie(movie_id: int):
 
 @router.post("/movies_extended")
 def add_movie(params: dict[str, Any]):
+    """
+    Add a new movie to the extended database.
+    Requires: title, director, year, description.
+    """
     try:
         with sqlite3.connect('movies-extended.db') as db:
             cursor = db.cursor()
@@ -73,6 +82,10 @@ def add_movie(params: dict[str, Any]):
 
 @router.put("/movies_extended/{movie_id}")
 def update_movie(movie_id: int, params: dict[str, Any]):
+    """
+    Update details of an existing movie by ID.
+    Replaces all fields: title, director, year, description.
+    """
     try:
         with sqlite3.connect('movies-extended.db') as db:
             cursor = db.cursor()
@@ -95,6 +108,9 @@ def update_movie(movie_id: int, params: dict[str, Any]):
 
 @router.delete("/movies_extended/{movie_id}", status_code=204)
 def delete_movie(movie_id: int):
+    """
+    Delete a specific movie from the database by ID.
+    """
     with sqlite3.connect('movies-extended.db') as db:
         cursor = db.cursor()
         cursor.execute("DELETE FROM movie WHERE id = ?", (movie_id,))
@@ -108,6 +124,9 @@ def delete_movie(movie_id: int):
 
 @router.delete("/movies_extended")
 def delete_all_movies():
+    """
+    Delete ALL movies from the extended database.
+    """
     with sqlite3.connect('movies-extended.db') as db:
         cursor = db.cursor()
         cursor.execute("DELETE FROM movie")
@@ -119,6 +138,9 @@ def delete_all_movies():
 
 @router.get("/movies_extended_search")
 def search_movies(characteristic: str):
+    """
+    Search for movies by matching title or director.
+    """
     with sqlite3.connect('movies-extended.db') as db:
         db.row_factory = sqlite3.Row
         cursor = db.cursor()
