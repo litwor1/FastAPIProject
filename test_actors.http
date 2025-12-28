@@ -1,0 +1,36 @@
+### Get ALL actors
+GET http://127.0.0.1:8000/actors
+
+### Get a SINGLE actor by ID
+GET http://127.0.0.1:8000/actors/1
+
+### 1. Add a new actor
+POST http://127.0.0.1:8000/actors
+Content-Type: application/json
+
+{
+  "name": "Leonardo",
+  "surname": "DiCaprio"
+}
+
+### 2. Update an actor
+PUT http://127.0.0.1:8000/actors/1
+Content-Type: application/json
+
+{
+  "name": "Leonardo",
+  "surname": "Wilhelm DiCaprio"
+}
+
+### 3. Try to update a non-existent actor
+PUT http://127.0.0.1:8000/actors/9999
+Content-Type: application/json
+
+{
+  "name": "Invisible",
+  "surname": "Man"
+}
+
+### 4. Delete a specific actor
+DELETE http://127.0.0.1:8000/actors/1
+

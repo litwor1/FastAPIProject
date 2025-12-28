@@ -36,6 +36,7 @@ Content-Type: application/json
   "year": "2020",
   "description": "This movie does not exist."
 }
+
 ### 4. Delete a specific movie
 DELETE http://127.0.0.1:8000/movies_extended/10
 

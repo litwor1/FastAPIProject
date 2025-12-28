@@ -39,3 +39,6 @@ DELETE http://127.0.0.1:8000/movies/4
 
 ### 5. Delete ALL movies
 DELETE http://127.0.0.1:8000/movies
+
+### 6. Find "Matrix" movie
+GET http://127.0.0.1:8000/moviesearch?characteristic=Matrix
