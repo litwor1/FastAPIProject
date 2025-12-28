@@ -5,14 +5,19 @@ import sqlite3
 router = APIRouter()
 
 
+def connect_to_db():
+    db = sqlite3.connect('movies-extended.db')
+    db.row_factory = sqlite3.Row
+    return db
+
+
 @router.get('/movies_extended')
 def get_extended_movies():
     """
     Retrieve all movies from the extended database.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
-            db.row_factory = sqlite3.Row
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute('SELECT * FROM movie')
             rows = cursor.fetchall()
@@ -38,8 +43,7 @@ def get_single_movie(movie_id: int):
     """
     Retrieve a single movie by its unique ID.
     """
-    with sqlite3.connect('movies-extended.db') as db:
-        db.row_factory = sqlite3.Row
+    with connect_to_db() as db:
         cursor = db.cursor()
         row = cursor.execute('SELECT * FROM movie WHERE id = ?', (movie_id,)).fetchone()
 
@@ -64,7 +68,7 @@ def add_extended_movie(params: dict[str, Any]):
     Requires: title, director, year, description.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute(
                 "INSERT INTO movie (title, director, year, description) VALUES (?, ?, ?, ?)",
@@ -87,7 +91,7 @@ def update_extended_movie(movie_id: int, params: dict[str, Any]):
     Replaces all fields: title, director, year, description.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute(
                 "UPDATE movie SET title=?, director=?, year=?, description=? WHERE id=?",
@@ -111,7 +115,7 @@ def delete_extended_movie(movie_id: int):
     """
     Delete a specific movie from the database by ID.
     """
-    with sqlite3.connect('movies-extended.db') as db:
+    with connect_to_db() as db:
         cursor = db.cursor()
         cursor.execute("DELETE FROM movie WHERE id = ?", (movie_id,))
         db.commit()
@@ -127,7 +131,7 @@ def delete_extended_all_movies():
     """
     Delete ALL movies from the extended database.
     """
-    with sqlite3.connect('movies-extended.db') as db:
+    with connect_to_db() as db:
         cursor = db.cursor()
         cursor.execute("DELETE FROM movie")
         db.commit()
@@ -141,8 +145,7 @@ def search_extended_movies(characteristic: str):
     """
     Search for movies by matching title or director.
     """
-    with sqlite3.connect('movies-extended.db') as db:
-        db.row_factory = sqlite3.Row
+    with connect_to_db() as db:
         cursor = db.cursor()
         rows = cursor.execute("SELECT * FROM movie WHERE title LIKE ? OR director LIKE ?",
                               ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
@@ -158,8 +161,7 @@ def get_all_actors():
     Retrieve all actors from the extended database.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
-            db.row_factory = sqlite3.Row
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute('SELECT * FROM actor')
             rows = cursor.fetchall()
@@ -183,8 +185,7 @@ def search_actors(actor_id):
     """
     Retrieve a single actor by their unique ID.
     """
-    with sqlite3.connect('movies-extended.db') as db:
-        db.row_factory = sqlite3.Row
+    with connect_to_db() as db:
         cursor = db.cursor()
         row = cursor.execute("SELECT * FROM actor WHERE id = ?", (actor_id,)).fetchone()
 
@@ -201,7 +202,7 @@ def add_actor(params: dict[str, Any]):
     Requires: name, surname.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute(
                 "INSERT INTO actor (name, surname) VALUES (?, ?)",
@@ -224,7 +225,7 @@ def update_actors(actor_id: int, params: dict[str, Any]):
     Replaces both fields: name, surname.
     """
     try:
-        with sqlite3.connect('movies-extended.db') as db:
+        with connect_to_db() as db:
             cursor = db.cursor()
             cursor.execute(
                 "UPDATE actor SET name=?, surname=? WHERE id=?",
@@ -248,7 +249,7 @@ def delete_actor(actor_id: int):
     """
     Delete a specific actor from the database by ID.
     """
-    with sqlite3.connect('movies-extended.db') as db:
+    with connect_to_db() as db:
         cursor = db.cursor()
         cursor.execute("DELETE FROM actor WHERE id = ?", (actor_id,))
         db.commit()
@@ -265,8 +266,7 @@ def get_actors_for_movie(movie_id: int):
     Fetches a list of actors for a specific movie identified by its ID.
 
     """
-    with sqlite3.connect('movies-extended.db') as db:
-        db.row_factory = sqlite3.Row
+    with connect_to_db() as db:
         cursor = db.cursor()
         query = """
                 SELECT actor.name, actor.surname

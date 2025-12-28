@@ -40,5 +40,3 @@ Content-Type: application/json
 ### 4. Delete a specific movie
 DELETE http://127.0.0.1:8000/movies_extended/10
 
-### 5. Delete ALL movies
-DELETE http://127.0.0.1:8000/movies_extended
