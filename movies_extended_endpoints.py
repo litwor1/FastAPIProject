@@ -17,12 +17,9 @@ def get_extended_movies():
     Retrieve all movies from the extended database.
     """
     db = connect_to_db()
-    cursor = db.cursor()
-
     try:
         query = 'SELECT * FROM movie'
-        cursor.execute(query)
-        rows = cursor.fetchall()
+        rows = db.execute(query).fetchall()
         return [dict(row) for row in rows]
 
     except sqlite3.Error as e:
@@ -37,10 +34,9 @@ def get_single_movie(movie_id: int):
     Retrieve a single movie by its unique ID.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = 'SELECT * FROM movie WHERE id = ?'
-        row = cursor.execute(query, (movie_id,)).fetchone()
+        row = db.execute(query, (movie_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
         return dict(row)
@@ -52,16 +48,11 @@ def get_single_movie(movie_id: int):
 def add_extended_movie(params: dict[str, Any]):
     """
     Add a new movie to the extended database.
-    Requires: title, director, year, description.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "INSERT INTO movie (title, director, year, description) VALUES (?, ?, ?, ?)"
-        cursor.execute(
-            query,
-            (params["title"], params["director"], params["year"], params["description"])
-        )
+        db.execute(query, (params["title"], params["director"], params["year"], params["description"]))
         db.commit()
         return {"message": f"Movie {params} added successfully"}
     except KeyError as e:
@@ -74,18 +65,15 @@ def add_extended_movie(params: dict[str, Any]):
 def update_extended_movie(movie_id: int, params: dict[str, Any]):
     """
     Update details of an existing movie by ID.
-    Replaces all fields: title, director, year, description.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "UPDATE movie SET title=?, director=?, year=?, description=? WHERE id=?"
-        cursor.execute(
-            query,
-            (params["title"], params["director"], params["year"], params["description"], movie_id)
-        )
+        cursor = db.execute(query,
+                            (params["title"], params["director"], params["year"], params["description"], movie_id))
         db.commit()
-        if cursor.rowcount == 0:
+
+        if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
         return {"message": "Movie updated successfully"}
     except KeyError as e:
@@ -100,14 +88,12 @@ def delete_extended_movie(movie_id: int):
     Delete a specific movie from the database by ID.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "DELETE FROM movie WHERE id = ?"
-        cursor.execute(query, (movie_id,))
+        cursor = db.execute(query, (movie_id,))
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
-
     finally:
         db.close()
 
@@ -118,9 +104,8 @@ def delete_extended_all_movies():
     Delete ALL movies from the extended database.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     query = "DELETE FROM movie"
-    cursor.execute(query)
+    cursor = db.execute(query)
     db.commit()
     deleted_count = cursor.rowcount
     db.close()
@@ -133,13 +118,14 @@ def search_extended_movies(characteristic: str):
     Search for movies by matching title or director.
     """
     db = connect_to_db()
-    cursor = db.cursor()
-    query = "SELECT * FROM movie WHERE title LIKE ? OR director LIKE ?"
-    rows = cursor.execute(query, ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
-    if rows:
+    try:
+        query = "SELECT * FROM movie WHERE title LIKE ? OR director LIKE ?"
+        rows = db.execute(query, ("%" + characteristic + "%", "%" + characteristic + "%",)).fetchall()
+        if not rows:
+            raise HTTPException(status_code=404, detail=f"Movie not found")
         return [dict(row) for row in rows]
-    else:
-        return {'message': 'Movie not found'}
+    finally:
+        db.close()
 
 
 @router.get('/actors')
@@ -148,15 +134,15 @@ def get_all_actors():
     Retrieve all actors from the extended database.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = 'SELECT * FROM actor'
-        cursor.execute(query)
-        rows = cursor.fetchall()
+        rows = db.execute(query).fetchall()
         return [dict(row) for row in rows]
 
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database Error: {e}")
+    finally:
+        db.close()
 
 
 @router.get("/actors/{actor_id:int}")
@@ -165,10 +151,9 @@ def search_actors(actor_id):
     Retrieve a single actor by their unique ID.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "SELECT * FROM actor WHERE id = ?"
-        row = cursor.execute(query, (actor_id,)).fetchone()
+        row = db.execute(query, (actor_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
         return dict(row)
@@ -179,17 +164,12 @@ def search_actors(actor_id):
 @router.post("/actors")
 def add_actor(params: dict[str, Any]):
     """
-    Add a new actor to the extended database (actors table).
-    Requires: name, surname.
+    Add a new actor to the extended database.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "INSERT INTO actor (name, surname) VALUES (?, ?)"
-        cursor.execute(
-            query,
-            (params["name"], params["surname"])
-        )
+        db.execute(query, (params["name"], params["surname"]))
         db.commit()
         return {"message": f"Actor {params} added successfully"}
 
@@ -203,18 +183,15 @@ def add_actor(params: dict[str, Any]):
 def update_actors(actor_id: int, params: dict[str, Any]):
     """
     Update details of an existing actor by ID.
-    Replaces both fields: name, surname.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "UPDATE actor SET name=?, surname=? WHERE id=?"
-        cursor.execute(query, (params["name"], params["surname"], actor_id))
+        cursor = db.execute(query, (params["name"], params["surname"], actor_id))
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
         return {"message": "Actors updated successfully"}
-
     except KeyError as e:
         raise HTTPException(status_code=400, detail=f"You are missing a required field: {e}")
     finally:
@@ -227,10 +204,9 @@ def delete_actor(actor_id: int):
     Delete a specific actor from the database by ID.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = "DELETE FROM actor WHERE id = ?"
-        cursor.execute(query, (actor_id,))
+        cursor = db.execute(query, (actor_id,))
         db.commit()
         if not cursor.rowcount:
             raise HTTPException(status_code=404, detail=f"Actor with ID {actor_id} not found")
@@ -245,7 +221,6 @@ def get_actors_for_movie(movie_id: int):
     Fetches a list of actors for a specific movie identified by its ID.
     """
     db = connect_to_db()
-    cursor = db.cursor()
     try:
         query = """
                 SELECT actor.name, actor.surname
@@ -253,8 +228,7 @@ def get_actors_for_movie(movie_id: int):
                          JOIN movie_actor_through ON actor.id = movie_actor_through.actor_id
                 WHERE movie_actor_through.movie_id = ? \
                 """
-        cursor.execute(query, (movie_id,))
-        rows = cursor.fetchall()
+        rows = db.execute(query, (movie_id,)).fetchall()
         if not rows:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
         return [dict(row) for row in rows]
