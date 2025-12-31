@@ -4,6 +4,7 @@ This project was created to practice FastAPI framework.
 
 The project was created for ISSI labs, following the instructions at https://moodle.lab.ii.agh.edu.pl/mod/page/view.php?id=23330
 
+Note: I intentionally did include .db files in the repository, as it is a demonstration project.
 
 ## 🚀 Features
 
