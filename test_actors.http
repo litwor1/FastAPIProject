@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### 2. Update an actor
-PUT http://127.0.0.1:8000/actors/1
+PUT http://127.0.0.1:8000/actors/20
 Content-Type: application/json
 
 {
@@ -32,7 +32,7 @@ Content-Type: application/json
 }
 
 ### 4. Delete a specific actor
-DELETE http://127.0.0.1:8000/actors/1
+DELETE http://127.0.0.1:8000/actors/11
 
 ### 5. Return actors for movie ID = 4
 http://127.0.0.1:8000/movies_extended/4/actors

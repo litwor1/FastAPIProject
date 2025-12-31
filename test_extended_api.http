@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### 2. Update a movie
-PUT http://127.0.0.1:8000/movies_extended/9
+PUT http://127.0.0.1:8000/movies_extended/1
 Content-Type: application/json
 
 {
@@ -38,5 +38,5 @@ Content-Type: application/json
 }
 
 ### 4. Delete a specific movie
-DELETE http://127.0.0.1:8000/movies_extended/9
+DELETE http://127.0.0.1:8000/movies_extended/10
 
