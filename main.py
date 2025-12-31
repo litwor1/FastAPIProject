@@ -4,6 +4,12 @@ import sqlite3
 from typing import Any
 from movies_extended_endpoints import router as extended_router
 
+"""
+main.py only contains the endpoints for the movies database.
+Endpoints for the movies-extended database are in movies_extended_endpoints.py
+The code in movies_extended_endpoints.py was refactored, following the 8.5 task. 
+The code in main.py was not refactored...
+"""
 app = FastAPI()
 app.include_router(extended_router)
 
@@ -110,7 +116,7 @@ def update_movie(movie_id: int, params: dict[str, Any]):
     return {"message": "Movie updated successfully"}
 
 
-@app.delete("/movies/{movie_id}", status_code=204)
+@app.delete("/movies/{movie_id}")
 def delete_movie(movie_id: int):
     with sqlite3.connect('movies.db') as db:
         cursor = db.cursor()
@@ -120,7 +126,7 @@ def delete_movie(movie_id: int):
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail=f"Movie with ID {movie_id} not found")
 
-    return
+    return {"message": "Movie deleted successfully"}
 
 
 @app.delete("/movies")
